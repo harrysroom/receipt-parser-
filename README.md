@@ -1,1 +1,1 @@
-# receipt-parser-
+# receipt-parser
