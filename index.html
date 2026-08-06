@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt to CSV Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen p-6">
+  <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Receipt to CSV</h1>
+      <!-- Stripe Checkout link place-holder -->
+      <a href="https://buy.stripe.com/" target="_blank" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-3 rounded-full shadow transition">
+        ⚡ Upgrade to Pro ($5/mo)
+      </a>
+    </div>
+
+    <p class="text-sm text-gray-500 text-center mb-6">Convert receipt images into structured CSV data instantly.</p>
+
+    <!-- File Dropzone -->
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50 hover:bg-gray-100 transition cursor-pointer" id="dropzone">
+      <input type="file" id="fileInput" accept="image/*" class="hidden">
+      <p class="text-gray-600 font-medium">Click or drag & drop receipt image here</p>
+      <span id="fileName" class="text-xs text-indigo-600 font-semibold block mt-2"></span>
+    </div>
+
+    <!-- Process Button -->
+    <button id="processBtn" class="w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition disabled:opacity-50">
+      Parse Receipt
+    </button>
+
+    <!-- Results Display -->
+    <div id="resultArea" class="mt-6 hidden">
+      <h2 class="text-md font-semibold mb-2">Extracted Data:</h2>
+      <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg text-sm font-mono space-y-1">
+        <p><strong>Vendor:</strong> <span id="resVendor"></span></p>
+        <p><strong>Date:</strong> <span id="resDate"></span></p>
+        <p><strong>Tax:</strong> $<span id="resTax"></span></p>
+        <p><strong>Total:</strong> $<span id="resTotal"></span></p>
+      </div>
+
+      <button id="downloadBtn" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition">
+        Download CSV
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const fileNameDisplay = document.getElementById('fileName');
+    const processBtn = document.getElementById('processBtn');
+    const resultArea = document.getElementById('resultArea');
+
+    let parsedResult = null;
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        fileNameDisplay.textContent = fileInput.files[0].name;
+      }
+    });
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+    });
+
+    processBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) return alert("Please select a receipt image.");
+
+      processBtn.disabled = true;
+      processBtn.textContent = "Processing with AI...";
+
+      try {
+        const base64 = await toBase64(file);
+
+        // Calls your Vercel backend serverless function
+        const response = await fetch('/api/parse', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageBase64: base64,
+            mimeType: file.type || "image/jpeg"
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        const jsonText = data.candidates[0].content.parts[0].text;
+        parsedResult = JSON.parse(jsonText);
+
+        document.getElementById('resVendor').textContent = parsedResult.vendor_name || 'N/A';
+        document.getElementById('resDate').textContent = parsedResult.transaction_date || 'N/A';
+        document.getElementById('resTax').textContent = parsedResult.tax_amount ?? '0.00';
+        document.getElementById('resTotal').textContent = parsedResult.total_amount ?? '0.00';
+
+        resultArea.classList.remove('hidden');
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        processBtn.disabled = false;
+        processBtn.textContent = "Parse Receipt";
+      }
+    });
+
+    // Blob download handler
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      if (!parsedResult) return;
+
+      const csvContent = "Vendor,Date,Tax,Total\n"
+        + `"${parsedResult.vendor_name}","${parsedResult.transaction_date}",${parsedResult.tax_amount},${parsedResult.total_amount}`;
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `receipt_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
