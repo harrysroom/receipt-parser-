@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Übersicht - Daily Life Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; }
+    .ios-card { background-color: #1c1c1e; border-radius: 20px; }
+    .ios-blur { backdrop-filter: blur(20px); background: rgba(28, 28, 30, 0.8); }
+  </style>
+</head>
+<body class="bg-black text-white min-h-screen pb-24">
+
+  <!-- Header Section -->
+  <div class="p-5 pt-8 max-w-lg mx-auto flex justify-between items-center">
+    <h1 class="text-3xl font-bold tracking-tight">Übersicht</h1>
+    <a href="https://buy.stripe.com/9B6aEW4Rh7KY6yo7BI6kg00" target="_blank" class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs shadow-lg">
+      PRO
+    </a>
+  </div>
+
+  <div class="px-5 max-w-lg mx-auto space-y-6">
+
+    <!-- Section: Angepinnt / Highlights -->
+    <div>
+      <h2 class="text-xl font-bold mb-3 tracking-tight">Angepinnt</h2>
+      <div class="space-y-3">
+        
+        <!-- Widget 1: Sport & Aktivität (Orange) -->
+        <div class="ios-card p-4">
+          <div class="flex items-center justify-between text-orange-500 font-semibold text-sm mb-2">
+            <span class="flex items-center gap-2">🔥 Aktivität & Sport</span>
+            <span class="text-xs text-gray-500">Heute</span>
+          </div>
+          <div class="flex justify-between items-end mt-4">
+            <div>
+              <p id="sportVal" class="text-3xl font-bold">45 <span class="text-base font-normal text-gray-400">Min</span></p>
+              <p class="text-xs text-gray-400 mt-1">Tagesziel: 60 Minuten</p>
+            </div>
+            <button onclick="addMetric('sportVal', 15)" class="bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 font-semibold px-3 py-1.5 rounded-full text-xs transition">
+              + 15 Min
+            </button>
+          </div>
+        </div>
+
+        <!-- Widget 2: Lernen & Focus (Blau) -->
+        <div class="ios-card p-4">
+          <div class="flex items-center justify-between text-blue-400 font-semibold text-sm mb-2">
+            <span class="flex items-center gap-2">📚 Lernen & Bildung</span>
+            <span class="text-xs text-gray-500">Heute</span>
+          </div>
+          <div class="flex justify-between items-end mt-4">
+            <div>
+              <p id="learnVal" class="text-3xl font-bold">2 <span class="text-base font-normal text-gray-400">Sessions</span></p>
+              <p class="text-xs text-gray-400 mt-1">Programmieren & Sprache</p>
+            </div>
+            <button onclick="addMetric('learnVal', 1)" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 font-semibold px-3 py-1.5 rounded-full text-xs transition">
+              + Session
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section: Tägliche Checkliste -->
+    <div>
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xl font-bold tracking-tight">Tägliche Aufgaben</h2>
+        <span class="text-xs text-gray-400">To-Do Checklist</span>
+      </div>
+
+      <!-- Quick Add Input -->
+      <div class="flex gap-2 mb-3">
+        <input type="text" id="todoInput" placeholder="Neue Aufgabe hinzufügen..." class="flex-1 bg-[#1c1c1e] border border-gray-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+        <select id="todoCat" class="bg-[#1c1c1e] border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-300 focus:outline-none">
+          <option value="text-pink-500">Gesundheit</option>
+          <option value="text-emerald-400">Business</option>
+          <option value="text-purple-400">Lernen</option>
+        </select>
+        <button id="addTodoBtn" class="bg-blue-600 hover:bg-blue-500 px-4 py-2.5 rounded-xl font-semibold text-sm transition">
+          +
+        </button>
+      </div>
+
+      <!-- Todo List Card -->
+      <div class="ios-card p-4 divide-y divide-gray-800/60" id="todoList">
+        <!-- Dynamic Content -->
+      </div>
+    </div>
+
+    <!-- Section: Pro Banner -->
+    <div class="ios-card p-5 border border-gray-800 text-center">
+      <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-2xl mx-auto flex items-center justify-center text-lg mb-3 shadow-lg shadow-blue-500/30">
+        📊
+      </div>
+      <h3 class="font-bold text-base">Wochen-Analysen & Trends</h3>
+      <p class="text-xs text-gray-400 mt-1 mb-4">Erhalte detaillierte Auswertungen deiner Aktivitäten analog zu Apple Health.</p>
+      <a href="https://buy.stripe.com/9B6aEW4Rh7KY6yo7BI6kg00" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+        Pro freischalten ($5/mo)
+      </a>
+    </div>
+
+  </div>
+
+  <!-- iOS Bottom Navigation Bar -->
+  <div class="fixed bottom-0 left-0 right-0 ios-blur border-t border-gray-800/80 p-3">
+    <div class="max-w-md mx-auto flex justify-around items-center text-xs">
+      <button class="flex flex-col items-center gap-1 text-blue-500 font-medium">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Übersicht
+      </button>
+      <button onclick="alert('Teilen-Funktion ist in der Pro-Version verfügbar!')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        Teilen
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let todos = JSON.parse(localStorage.getItem('ios_hub_todos')) || [
+      { id: 1, name: 'Medikamente / Vitamine einnehmen', cat: 'text-pink-500', done: false },
+      { id: 2, name: '30 Min Vokabeln lernen', cat: 'text-purple-400', done: true },
+      { id: 3, name: 'Trading-Karten Bestand prüfen', cat: 'text-emerald-400', done: false }
+    ];
+
+    function saveAndRender() {
+      localStorage.setItem('ios_hub_todos', JSON.stringify(todos));
+      renderTodos();
+    }
+
+    function renderTodos() {
+      const list = document.getElementById('todoList');
+      list.innerHTML = '';
+      todos.forEach(todo => {
+        const item = document.createElement('div');
+        item.className = 'py-3 flex items-center justify-between first:pt-0 last:pb-0';
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <button onclick="toggleTodo(${todo.id})" class="w-6 h-6 rounded-full border border-gray-600 flex items-center justify-center transition ${todo.done ? 'bg-blue-600 border-blue-600 text-white' : ''}">
+              ${todo.done ? '✓' : ''}
+            </button>
+            <span class="text-sm ${todo.done ? 'line-through text-gray-500' : 'text-gray-200'}">${todo.name}</span>
+          </div>
+          <span class="text-[10px] uppercase tracking-wider font-bold ${todo.cat}">●</span>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById('addTodoBtn').addEventListener('click', () => {
+      const input = document.getElementById('todoInput');
+      const cat = document.getElementById('todoCat');
+      if (!input.value.trim()) return;
+      todos.push({ id: Date.now(), name: input.value.trim(), cat: cat.value, done: false });
+      input.value = '';
+      saveAndRender();
+    });
+
+    window.toggleTodo = function(id) {
+      todos = todos.map(t => t.id === id ? { ...t, done: !t.done } : t);
+      saveAndRender();
+    };
+
+    window.addMetric = function(elementId, amount) {
+      const el = document.getElementById(elementId);
+      const current = parseInt(el.textContent) || 0;
+      const unit = elementId === 'sportVal' ? ' <span class="text-base font-normal text-gray-400">Min</span>' : ' <span class="text-base font-normal text-gray-400">Sessions</span>';
+      el.innerHTML = (current + amount) + unit;
+    };
+
+    renderTodos();
+  </script>
+</body>
+</html>
