@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Bücher Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    .apple-nav {
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: rgba(30, 30, 32, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bg-theme-dark { background: linear-gradient(180deg, #2c1e18 0%, #120e0c 100%); }
+
+    .book-cover {
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28 select-none">
+
+  <!-- ================= TAB 1: STARTSEITE ================= -->
+  <div id="tab-home" class="page active">
+    <div class="p-5 pt-8 max-w-lg mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight">Startseite</h1>
+        <button onclick="requestAdminAccess()" class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-gray-300">
+          ⚙️
+        </button>
+      </div>
+
+      <!-- ADMIN / UPLOAD PANEL -->
+      <div id="admin-panel" class="hidden mb-8 p-4 bg-zinc-900 border border-amber-500/50 rounded-2xl space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-sm text-amber-400">Admin-Bereich (Bearbeiten)</h3>
+          <button onclick="toggleAdminPanel()" class="text-xs text-gray-400">Schließen</button>
+        </div>
+        
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Cover Bild ändern:</label>
+          <input type="file" id="cover-input" accept="image/*" class="text-xs text-gray-300 w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black">
+        </div>
+
+        <!-- Button zum Löschen des Covers -->
+        <button onclick="removeCoverImage()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-semibold py-1.5 rounded-full text-xs">
+          🗑️ Hochgeladenes Cover löschen
+        </button>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Kapitel 1 / Leseprobe Text:</label>
+          <textarea id="chapter-input" rows="5" placeholder="Schreibe hier dein erstes Kapitel rein..." class="w-full bg-black border border-zinc-700 rounded-xl p-2 text-xs text-white focus:outline-none"></textarea>
+        </div>
+
+        <button onclick="saveBookData()" class="w-full bg-amber-500 text-black font-bold py-2 rounded-full text-xs">Änderungen speichern</button>
+      </div>
+
+      <!-- Direktes Buch-Highlight -->
+      <div class="flex flex-col items-center">
+        <div onclick="openBook('book-krieg-rollstuhl')" class="w-44 h-64 relative rounded-lg overflow-hidden book-cover cursor-pointer mb-4 border border-amber-600/30">
+          <div id="home-cover-default" class="w-full h-full bg-gradient-to-b from-amber-900 via-stone-900 to-black p-4 flex flex-col justify-between">
+            <span class="text-[9px] bg-amber-500 text-black font-extrabold px-1.5 py-0.5 rounded w-max">BIOGRAFIE</span>
+            <div>
+              <p class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">Haroon Ahmad</p>
+              <p class="text-base font-black text-white leading-tight mt-0.5">VOM KRIEG BIS ZUM ROLLSTUHL</p>
+            </div>
+            <span class="text-[9px] text-gray-500">ORIGINALAUSGABE</span>
+          </div>
+          <img id="home-cover-img" class="w-full h-full object-cover hidden" alt="Cover">
+        </div>
+
+        <h2 class="text-lg font-bold text-center">Vom Krieg bis zum Rollstuhl</h2>
+        <p class="text-xs text-gray-400 mt-1">Haroon Ahmad</p>
+        <p class="text-sm font-semibold text-white mt-2">14,99 €</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 2: BOOK STORE ================= -->
+  <div id="tab-store" class="page">
+    <div class="p-5 pt-8 max-w-lg mx-auto">
+      <h1 class="text-3xl font-extrabold tracking-tight mb-6">Book Store</h1>
+
+      <div class="space-y-4">
+        <div onclick="openBook('book-krieg-rollstuhl')" class="bg-zinc-900 p-4 rounded-2xl flex gap-4 items-center cursor-pointer border border-zinc-800">
+          <div class="w-16 h-24 relative rounded overflow-hidden shrink-0 border border-zinc-700">
+            <div id="store-cover-default" class="w-full h-full bg-gradient-to-b from-amber-900 to-black p-2 flex flex-col justify-between">
+              <span class="text-[7px] text-amber-300 font-bold">AHMAD</span>
+              <span class="text-[8px] font-black leading-tight">VOM KRIEG BIS ZUM ROLLSTUHL</span>
+            </div>
+            <img id="store-cover-img" class="w-full h-full object-cover hidden" alt="Cover">
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">Vom Krieg bis zum Rollstuhl</h3>
+            <p class="text-xs text-gray-400">Haroon Ahmad</p>
+            <span class="inline-block mt-2 text-xs font-bold bg-white text-black px-3 py-1 rounded-full">14,99 €</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DETAIL SEITE ================= -->
+  <div id="book-krieg-rollstuhl" class="page bg-theme-dark min-h-screen">
+    <div class="p-5 max-w-lg mx-auto">
+      <div class="flex justify-between items-center mb-6">
+        <button onclick="switchTab('tab-store')" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center font-bold text-sm">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col items-center text-center">
+        <div class="w-48 h-72 relative rounded-lg overflow-hidden book-cover border border-amber-600/40 mb-6">
+          <div id="detail-cover-default" class="w-full h-full bg-gradient-to-b from-amber-900 via-stone-900 to-black p-4 flex flex-col justify-between">
+            <span class="bg-amber-500 text-black text-[9px] font-extrabold px-2 py-0.5 rounded w-max mx-auto">BIOGRAFIE</span>
+            <div>
+              <p class="text-xs text-amber-300 font-extrabold tracking-widest uppercase">Haroon Ahmad</p>
+              <p class="text-xl font-black tracking-tight leading-tight mt-1">VOM KRIEG BIS ZUM ROLLSTUHL</p>
+            </div>
+            <span class="text-[9px] text-gray-500">ORIGINALAUSGABE</span>
+          </div>
+          <img id="detail-cover-img" class="w-full h-full object-cover hidden" alt="Cover">
+        </div>
+
+        <h1 class="text-xl font-bold leading-snug px-4">Vom Krieg bis zum Rollstuhl</h1>
+        <p class="text-xs text-gray-300 mt-2 font-medium">Haroon Ahmad ›</p>
+
+        <div class="w-full bg-white/10 backdrop-blur-xl rounded-2xl p-4 mt-6 border border-white/10">
+          <div class="text-left text-xs text-gray-300 mb-3">Buch <br><span class="text-gray-400">15. Juli 2026</span></div>
+          <a href="https://buy.stripe.com/9B6aEW4Rh7KY6yo7BI6kg00" target="_blank" class="w-full bg-white text-black font-bold py-3 rounded-full block text-center mb-3 text-sm">14,99 € Kaufen</a>
+          <button onclick="openReader()" class="w-full bg-white/15 text-white font-semibold py-3 rounded-full text-sm flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Auszug lesen (Kapitel 1)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LESEMODUS / READER ================= -->
+  <div id="reader-modal" class="fixed inset-0 bg-[#121212] z-50 hidden flex flex-col">
+    <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-[#1c1c1e]">
+      <div>
+        <p class="text-xs font-bold text-amber-500">KAPITEL 1</p>
+        <p class="text-sm font-black">Vom Krieg bis zum Rollstuhl</p>
+      </div>
+      <button onclick="closeReader()" class="bg-white/10 px-4 py-1.5 rounded-full text-xs font-bold">Fertig</button>
+    </div>
+
+    <div class="p-6 overflow-y-auto flex-1 max-w-xl mx-auto leading-relaxed text-gray-200 text-sm space-y-4" id="reader-text-container">
+      <p id="reader-text" class="whitespace-pre-line">
+        Ich heiße Haroon...
+      </p>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav class="fixed bottom-0 left-0 right-0 apple-nav z-40 py-2.5 px-4">
+    <div class="max-w-xs mx-auto flex justify-around items-center text-[10px] text-gray-400 font-medium">
+      <button onclick="switchTab('tab-home')" id="nav-home" class="flex flex-col items-center gap-1 text-white">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+        Startseite
+      </button>
+      <button onclick="switchTab('tab-store')" id="nav-store" class="flex flex-col items-center gap-1 hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Book Store
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    const ADMIN_PIN = "1234";
+
+    function requestAdminAccess() {
+      const inputPin = prompt("Bitte Admin-PIN eingeben:");
+      if (inputPin === ADMIN_PIN) {
+        toggleAdminPanel();
+      } else if (inputPin !== null) {
+        alert("Falsche PIN!");
+      }
+    }
+
+    function toggleAdminPanel() {
+      const panel = document.getElementById('admin-panel');
+      panel.classList.toggle('hidden');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function openBook(bookId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(bookId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function saveBookData() {
+      const coverInput = document.getElementById('cover-input');
+      const chapterInput = document.getElementById('chapter-input').value;
+
+      if (chapterInput.trim() !== "") {
+        localStorage.setItem('book_chapter_1', chapterInput);
+        document.getElementById('reader-text').innerText = chapterInput;
+      }
+
+      if (coverInput.files && coverInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgUrl = e.target.result;
+          localStorage.setItem('book_cover_img', imgUrl);
+          applyCoverImage(imgUrl);
+        };
+        reader.readAsDataURL(coverInput.files[0]);
+      }
+
+      alert("Änderungen wurden gespeichert!");
+      toggleAdminPanel();
+    }
+
+    function removeCoverImage() {
+      if (confirm("Möchtest du das aktuelle Cover wirklich löschen?")) {
+        localStorage.removeItem('book_cover_img');
+        ['home', 'store', 'detail'].forEach(prefix => {
+          const defaultEl = document.getElementById(`${prefix}-cover-default`);
+          const imgEl = document.getElementById(`${prefix}-cover-img`);
+          if (defaultEl && imgEl) {
+            defaultEl.classList.remove('hidden');
+            imgEl.classList.add('hidden');
+            imgEl.src = "";
+          }
+        });
+        document.getElementById('cover-input').value = "";
+        alert("Cover wurde zurückgesetzt.");
+      }
+    }
+
+    function applyCoverImage(url) {
+      ['home', 'store', 'detail'].forEach(prefix => {
+        const defaultEl = document.getElementById(`${prefix}-cover-default`);
+        const imgEl = document.getElementById(`${prefix}-cover-img`);
+        if (defaultEl && imgEl) {
+          defaultEl.classList.add('hidden');
+          imgEl.src = url;
+          imgEl.classList.remove('hidden');
+        }
+      });
+    }
+
+    function openReader() {
+      document.getElementById('reader-modal').classList.remove('hidden');
+    }
+
+    function closeReader() {
+      document.getElementById('reader-modal').classList.add('hidden');
+    }
+
+    window.onload = function() {
+      const savedCover = localStorage.getItem('book_cover_img');
+      if (savedCover) {
+        applyCoverImage(savedCover);
+      }
+
+      const savedChapter = localStorage.getItem('book_chapter_1');
+      if (savedChapter) {
+        document.getElementById('reader-text').innerText = savedChapter;
+        document.getElementById('chapter-input').value = savedChapter;
+      }
+    };
+  </script>
+</body>
+</html>
