@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Bücher Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    /* Apple Navigation Bar Glassmorphism */
+    .apple-nav {
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: rgba(30, 30, 32, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Apple Theme Color Gradient */
+    .bg-theme-dark { background: linear-gradient(180deg, #2c1e18 0%, #120e0c 100%); }
+
+    /* Book Cover Shadow & Styling */
+    .book-cover {
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+      border-radius: 8px;
+    }
+    
+    /* Smooth Popups */
+    .modal-enter { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28 select-none">
+
+  <!-- ================= TAB 1: STARTSEITE ================= -->
+  <div id="tab-home" class="page active">
+    <div class="p-5 pt-8 max-w-lg mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight">Startseite</h1>
+        <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+          <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+
+      <!-- Direktes Buch-Highlight -->
+      <div class="flex flex-col items-center">
+        <div onclick="openBook('book-krieg-rollstuhl')" class="w-44 h-64 bg-gradient-to-b from-amber-900 via-stone-900 to-black rounded-lg p-4 flex flex-col justify-between book-cover border border-amber-600/30 cursor-pointer mb-4">
+          <span class="text-[9px] bg-amber-500 text-black font-extrabold px-1.5 py-0.5 rounded w-max">BIOGRAFIE</span>
+          <div>
+            <p class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">Haroon Ahmad</p>
+            <p class="text-base font-black text-white leading-tight mt-0.5">VOM KRIEG BIS ZUM ROLLSTUHL</p>
+          </div>
+          <span class="text-[9px] text-gray-500">ORIGINALAUSGABE</span>
+        </div>
+        <h2 class="text-lg font-bold text-center">Vom Krieg bis zum Rollstuhl</h2>
+        <p class="text-xs text-gray-400 mt-1">Haroon Ahmad</p>
+        <p class="text-sm font-semibold text-white mt-2">14,99 €</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 2: BOOK STORE ================= -->
+  <div id="tab-store" class="page">
+    <div class="p-5 pt-8 max-w-lg mx-auto">
+      <h1 class="text-3xl font-extrabold tracking-tight mb-6">Book Store</h1>
+
+      <div class="space-y-4">
+        <div onclick="openBook('book-krieg-rollstuhl')" class="bg-zinc-900 p-4 rounded-2xl flex gap-4 items-center cursor-pointer border border-zinc-800">
+          <div class="w-16 h-24 bg-gradient-to-b from-amber-900 to-black rounded p-2 flex flex-col justify-between shrink-0">
+            <span class="text-[7px] text-amber-300 font-bold">AHMAD</span>
+            <span class="text-[8px] font-black leading-tight">VOM KRIEG BIS ZUM ROLLSTUHL</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">Vom Krieg bis zum Rollstuhl</h3>
+            <p class="text-xs text-gray-400">Haroon Ahmad</p>
+            <span class="inline-block mt-2 text-xs font-bold bg-white text-black px-3 py-1 rounded-full">14,99 €</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DETAIL SEITE: VOM KRIEG BIS ZUM ROLLSTUHL ================= -->
+  <div id="book-krieg-rollstuhl" class="page bg-theme-dark min-h-screen">
+    <div class="p-5 max-w-lg mx-auto">
+      <!-- Top Action Bar -->
+      <div class="flex justify-between items-center mb-6">
+        <button onclick="switchTab('tab-store')" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center font-bold text-sm">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <div class="flex gap-2">
+          <button id="fav-btn-krieg-rollstuhl" onclick="toggleFavorite('krieg-rollstuhl', 'Vom Krieg bis zum Rollstuhl', '14,99 €')" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg">
+            <svg id="plus-icon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Book Cover -->
+      <div class="flex flex-col items-center text-center">
+        <div class="w-48 h-72 bg-gradient-to-b from-amber-900 via-stone-900 to-black rounded-lg p-4 flex flex-col justify-between book-cover border border-amber-600/40 mb-6 relative">
+          <span class="bg-amber-500 text-black text-[9px] font-extrabold px-2 py-0.5 rounded w-max mx-auto">BIOGRAFIE</span>
+          <div>
+            <p class="text-xs text-amber-300 font-extrabold tracking-widest uppercase">Haroon Ahmad</p>
+            <p class="text-xl font-black tracking-tight leading-tight mt-1">VOM KRIEG BIS ZUM ROLLSTUHL</p>
+          </div>
+          <span class="text-[9px] text-gray-500">ORIGINALAUSGABE</span>
+        </div>
+
+        <h1 class="text-xl font-bold leading-snug px-4">Vom Krieg bis zum Rollstuhl</h1>
+        <p class="text-xs text-gray-300 mt-2 font-medium">Haroon Ahmad ›</p>
+
+        <!-- Purchase Box -->
+        <div class="w-full bg-white/10 backdrop-blur-xl rounded-2xl p-4 mt-6 border border-white/10">
+          <div class="text-left text-xs text-gray-300 mb-3">Buch <br><span class="text-gray-400">15. Juli 2026</span></div>
+          <a href="https://buy.stripe.com/9B6aEW4Rh7KY6yo7BI6kg00" target="_blank" class="w-full bg-white text-black font-bold py-3 rounded-full block text-center mb-3 text-sm">14,99 € Kaufen</a>
+          <button onclick="showAppleModal()" class="w-full bg-white/15 text-white font-semibold py-3 rounded-full text-sm flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Auszug laden
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLE MODAL POPUP -->
+  <div id="apple-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-6">
+    <div class="bg-[#2c2c2e] text-center p-6 rounded-3xl max-w-xs w-full modal-enter border border-white/10 shadow-2xl">
+      <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 class="text-lg font-bold mb-2">Hinzugefügt</h3>
+      <p class="text-xs text-gray-300 leading-relaxed mb-6">Dieses Buch wurde zu deinen Favoriten hinzugefügt und ein Auszug wurde geladen.</p>
+      <button onclick="closeAppleModal()" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-full text-xs tracking-wider">FERTIG</button>
+    </div>
+  </div>
+
+  <!-- APPLE TAB BAR NAVIGATION -->
+  <nav class="fixed bottom-0 left-0 right-0 apple-nav z-40 py-2.5 px-4">
+    <div class="max-w-xs mx-auto flex justify-around items-center text-[10px] text-gray-400 font-medium">
+      
+      <!-- STARTSEITE -->
+      <button onclick="switchTab('tab-home')" id="nav-home" class="flex flex-col items-center gap-1 text-white">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+        Startseite
+      </button>
+
+      <!-- BOOK STORE -->
+      <button onclick="switchTab('tab-store')" id="nav-store" class="flex flex-col items-center gap-1 hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Book Store
+      </button>
+
+    </div>
+  </nav>
+
+  <script>
+    let wishlist = JSON.parse(localStorage.getItem('apple_books_wishlist')) || {};
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function openBook(bookId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(bookId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function toggleFavorite(id, title, price) {
+      const btn = document.getElementById(`fav-btn-${id}`);
+      if (wishlist[id]) {
+        delete wishlist[id];
+        btn.innerHTML = `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>`;
+        btn.classList.remove('bg-white', 'text-black');
+      } else {
+        wishlist[id] = { title, price };
+        btn.innerHTML = `<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+        btn.classList.add('bg-white', 'text-black');
+        showAppleModal();
+      }
+      localStorage.setItem('apple_books_wishlist', JSON.stringify(wishlist));
+    }
+
+    function showAppleModal() {
+      document.getElementById('apple-modal').classList.remove('hidden');
+    }
+
+    function closeAppleModal() {
+      document.getElementById('apple-modal').classList.add('hidden');
+    }
+
+    // Initialize saved button state on load
+    Object.keys(wishlist).forEach(id => {
+      const btn = document.getElementById(`fav-btn-${id}`);
+      if (btn) {
+        btn.innerHTML = `<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+        btn.classList.add('bg-white', 'text-black');
+      }
+    });
+  </script>
+</body>
+</html>
