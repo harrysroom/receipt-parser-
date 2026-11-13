@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ahmad Cards - Premium TCG Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #09090b;
+      color: #f4f4f5;
+    }
+    h1, h2, h3, .font-heading { font-family: 'Outfit', sans-serif; }
+
+    /* Glassmorphism & UI */
+    .glass {
+      background: rgba(24, 24, 27, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-gold {
+      background: rgba(30, 24, 16, 0.8);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .card-glow {
+      box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.15);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-glow:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -15px rgba(245, 158, 11, 0.3);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body class="min-h-screen pb-32 antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- TOP NAVIGATION -->
+  <header class="sticky top-0 z-40 glass border-b border-white/10 px-5 py-4">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('store')">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center font-black text-black text-sm">TCG</div>
+        <span class="font-heading font-extrabold text-lg tracking-tight text-white">AHMAD CARDS</span>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Warenkorb Button -->
+        <button onclick="toggleCart()" class="relative p-2.5 rounded-full glass hover:bg-white/10 transition">
+          <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cart-badge" class="absolute -top-1 -right-1 bg-amber-500 text-black font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+        <!-- Admin Trigger -->
+        <button onclick="requestAdminAccess()" class="p-2.5 rounded-full glass hover:bg-white/10 transition text-xs">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-4xl mx-auto px-4 pt-6">
+
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel" class="hidden mb-8 p-5 glass-gold rounded-3xl space-y-4">
+      <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
+        <h3 class="font-heading font-bold text-sm text-amber-300">Admin Dashboard: Karte hinzufügen</h3>
+        <button onclick="toggleAdminPanel()" class="text-xs text-gray-400 hover:text-white">✕ Schließen</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="text" id="new-card-name" placeholder="Karten-Name (z.B. Gengar VMAX)" class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white">
+        <input type="text" id="new-card-price" placeholder="Preis (z.B. 49,99 €)" class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white">
+        <input type="text" id="new-card-set" placeholder="Set / Seltenheit (z.B. Secret Rare)" class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white">
+        <input type="text" id="new-card-img" placeholder="Bild-URL (Link zu Pokémon Card)" class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white">
+      </div>
+      <button onclick="addNewCard()" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-extrabold py-2.5 rounded-xl text-xs transition">Karte im Store veröffentlichen</button>
+    </div>
+
+    <!-- TAB 1: STORE / KATALOG -->
+    <div id="tab-store" class="page active space-y-8">
+      
+      <!-- HERO BANNER -->
+      <div class="relative rounded-3xl overflow-hidden glass p-8 border border-amber-500/20 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-3 text-center md:text-left z-10">
+          <span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-extrabold text-[10px] tracking-widest uppercase px-3 py-1 rounded-full">Trending Pokémon Cards</span>
+          <h1 class="text-3xl md:text-4xl font-black text-white font-heading leading-tight">Geprüfte Raritäten <br>& Sammlerstücke</h1>
+          <p class="text-xs text-gray-400 max-w-sm">Sicherer Kauf, ultraschneller Versand und 100% originale Top-Zustände (Mint/Near Mint).</p>
+        </div>
+        <div class="w-40 h-56 rounded-2xl bg-gradient-to-tr from-amber-600 via-purple-900 to-indigo-950 p-3 card-glow flex flex-col justify-between shrink-0 border border-amber-400/30">
+          <span class="text-[9px] bg-black/60 text-amber-300 font-bold px-2 py-0.5 rounded w-max">GRADED 10</span>
+          <div class="text-center">
+            <p class="text-[9px] text-gray-300 font-bold">SPECIAL ILLUSTRATION</p>
+            <p class="text-xs font-black text-white mt-1">PIKACHU EX</p>
+          </div>
+          <span class="text-[8px] text-right text-gray-400">#001/050</span>
+        </div>
+      </div>
+
+      <!-- FILTER & PRODUKTE -->
+      <div>
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-xl font-heading font-bold text-white">Verfügbare Karten</h2>
+          <span class="text-xs text-gray-400">Live aktualisiert</span>
+        </div>
+
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Dynamische Produktkarten per JS -->
+        </div>
+      </div>
+
+      <!-- BEWERTUNGEN SEKTION MIT PROFILBILDERN & VERIFIZIERUNG -->
+      <section class="mt-12 pt-8 border-t border-white/10 space-y-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-heading font-bold text-white">Verifizierte Kundenbewertungen</h3>
+            <p class="text-xs text-gray-400">4,9 von 5 Sternen basierend auf 142 Sammler-Käufen</p>
+          </div>
+          <div class="flex items-center gap-1 text-amber-400 text-sm font-bold">
+            ★★★★★
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Review 1 -->
+          <div class="glass p-4 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-amber-500/40" alt="Avatar">
+                <div>
+                  <p class="text-xs font-bold text-white flex items-center gap-1">Sarah M. <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.2 rounded-full">✓ Verifiziert</span></p>
+                  <p class="text-[10px] text-gray-400">vor 2 Tagen</p>
+                </div>
+              </div>
+              <span class="text-amber-400 text-xs">★★★★★</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">„Karte kam super sicher verpackt im Toploader an. Zustand war absolut Mint wie beschrieben. Gerne wieder!“</p>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="glass p-4 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-amber-500/40" alt="Avatar">
+                <div>
+                  <p class="text-xs font-bold text-white flex items-center gap-1">Kevin B. <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.2 rounded-full">✓ Verifiziert</span></p>
+                  <p class="text-[10px] text-gray-400">vor 5 Tagen</p>
+                </div>
+              </div>
+              <span class="text-amber-400 text-xs">★★★★★</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">„Blitzschneller Versand und extrem edler Shop. Die Gengar VMAX Karte ist ein absolutes Highlight in meiner Sammlung.“</p>
+          </div>
+
+          <!-- Review 3 -->
+          <div class="glass p-4 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-amber-500/40" alt="Avatar">
+                <div>
+                  <p class="text-xs font-bold text-white flex items-center gap-1">Jessica W. <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.2 rounded-full">✓ Verifiziert</span></p>
+                  <p class="text-[10px] text-gray-400">vor 1 Woche</p>
+                </div>
+              </div>
+              <span class="text-amber-400 text-xs">★★★★★</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">„Top Kundenservice und erstklassige Ware. Hier merkt man die Liebe zum Sammeln!“</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- WARENKORB SIDEBAR / MODAL -->
+  <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex justify-end">
+    <div class="w-full max-w-md bg-[#121215] h-full p-6 flex flex-col justify-between border-l border-white/10 shadow-2xl">
+      <div class="space-y-4">
+        <div class="flex justify-between items-center border-b border-white/10 pb-4">
+          <h3 class="font-heading font-bold text-base text-white">Dein Warenkorb</h3>
+          <button onclick="toggleCart()" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs">✕</button>
+        </div>
+
+        <div id="cart-items-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          <!-- Dynamische Warenkorb-Einträge -->
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 pt-4 space-y-4">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-400">Gesamtsumme:</span>
+          <span id="cart-total-price" class="font-black text-amber-400 text-lg">0,00 €</span>
+        </div>
+        <a href="https://buy.stripe.com/9B6aEW4Rh7KY6yo7BI6kg00" target="_blank" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold py-3.5 rounded-2xl block text-center text-xs shadow-lg shadow-amber-500/20 hover:opacity-95 transition">
+          Sicher zur Kasse (Stripe)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR UNTEN -->
+  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 z-30 py-3 px-6">
+    <div class="max-w-xs mx-auto flex justify-around items-center text-[11px] text-gray-400 font-semibold">
+      <button onclick="switchTab('store')" class="flex flex-col items-center gap-1 text-amber-400">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+        Shop
+      </button>
+      <button onclick="toggleCart()" class="flex flex-col items-center gap-1 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Warenkorb
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    const ADMIN_PIN = "0313";
+
+    // Standard Produktkatalog (Pokémon Karten)
+    let cards = [
+      { id: '1', name: 'Gengar VMAX', price: 49.99, rarity: 'Secret Rare', img: 'https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=500&auto=format&fit=crop&q=80' },
+      { id: '2', name: 'Pikachu ex Gold', price: 79.99, rarity: 'Hyper Rare', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=80' },
+      { id: '3', name: 'Mew ex Special', price: 34.99, rarity: 'Illustration Rare', img: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=500&auto=format&fit=crop&q=80' },
+      { id: '4', name: 'Galarian Moltres V', price: 29.99, rarity: 'Alternate Art', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80' }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem('tcg_cart')) || [];
+
+    function initStore() {
+      const savedCards = localStorage.getItem('tcg_custom_cards');
+      if (savedCards) cards = JSON.parse(savedCards);
+      renderProducts();
+      updateCartBadge();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+
+      cards.forEach(card => {
+        const div = document.createElement('div');
+        div.className = "glass p-3.5 rounded-2xl card-glow flex flex-col justify-between";
+        div.innerHTML = `
+          <div>
+            <div class="w-full h-44 rounded-xl overflow-hidden mb-3 bg-black/40 relative">
+              <img src="${card.img}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" alt="${card.name}" onerror="this.src='https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=500&auto=format&fit=crop&q=80'">
+              <span class="absolute top-2 left-2 text-[9px] bg-black/70 backdrop-blur-md text-amber-400 font-bold px-2 py-0.5 rounded-full border border-amber-500/20">${card.rarity}</span>
+            </div>
+            <h3 class="font-heading font-bold text-sm text-white truncate">${card.name}</h3>
+            <p class="text-xs font-black text-amber-400 mt-1">${card.price.toFixed(2).replace('.', ',')} €</p>
+          </div>
+          <button onclick="addToCart('${card.id}')" class="mt-4 w-full bg-white/10 hover:bg-amber-400 hover:text-black text-white font-extrabold py-2 rounded-xl text-xs transition">
+            In den Warenkorb
+          </button>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function addToCart(id) {
+      const item = cards.find(c => c.id === id);
+      if (item) {
+        cart.push(item);
+        saveCart();
+        updateCartBadge();
+        toggleCart();
+      }
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCartItems();
+      updateCartBadge();
+    }
+
+    function saveCart() {
+      localStorage.setItem('tcg_cart', JSON.stringify(cart));
+    }
+
+    function updateCartBadge() {
+      const badge = document.getElementById('cart-badge');
+      if (cart.length > 0) {
+        badge.textContent = cart.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function toggleCart() {
+      const modal = document.getElementById('cart-modal');
+      modal.classList.toggle('hidden');
+      renderCartItems();
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cart-items-container');
+      const totalEl = document.getElementById('cart-total-price');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-500 italic text-center py-6">Dein Warenkorb ist leer.</p>`;
+        totalEl.textContent = '0,00 €';
+        return;
+      }
+
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price;
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center glass p-3 rounded-xl";
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <img src="${item.img}" class="w-10 h-12 rounded object-cover">
+            <div>
+              <p class="text-xs font-bold text-white">${item.name}</p>
+              <p class="text-[11px] text-amber-400 font-semibold">${item.price.toFixed(2).replace('.', ',')} €</p>
+            </div>
+          </div>
+          <button onclick="removeFromCart(${index})" class="text-xs text-red-400 hover:text-red-300 p-1">Entfernen</button>
+        `;
+        container.appendChild(div);
+      });
+
+      totalEl.textContent = total.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function requestAdminAccess() {
+      const pin = prompt("Admin PIN eingeben (Standard: 0313):");
+      if (pin === ADMIN_PIN) {
+        toggleAdminPanel();
+      } else if (pin !== null) {
+        alert("Falsche PIN!");
+      }
+    }
+
+    function toggleAdminPanel() {
+      document.getElementById('admin-panel').classList.toggle('hidden');
+    }
+
+    function addNewCard() {
+      const name = document.getElementById('new-card-name').value;
+      const priceVal = parseFloat(document.getElementById('new-card-price').value.replace(',', '.'));
+      const rarity = document.getElementById('new-card-set').value;
+      const img = document.getElementById('new-card-img').value;
+
+      if (!name || isNaN(priceVal)) {
+        alert("Bitte gib einen gültigen Namen und Preis ein.");
+        return;
+      }
+
+      const newCard = {
+        id: "card-" + Date.now(),
+        name: name,
+        price: priceVal,
+        rarity: rarity || "Special Card",
+        img: img || "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=500&auto=format&fit=crop&q=80"
+      };
+
+      cards.push(newCard);
+      localStorage.setItem('tcg_custom_cards', JSON.stringify(cards));
+      renderProducts();
+      toggleAdminPanel();
+      alert("Neue Karte erfolgreich hinzugefügt!");
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    window.onload = initStore;
+  </script>
+</body>
+</html>
